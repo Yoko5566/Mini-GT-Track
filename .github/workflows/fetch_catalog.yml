@@ -1,31 +1,35 @@
-name: 🔄 Fetch MiniGT Catalog
+name: Fetch MiniGT Catalog
 
 on:
-  workflow_dispatch:  # ✅ 只保留這個，表示你可以手動觸發
+  schedule:
+    - cron: '0 2 * * *'  # 每天台灣早上10點 (UTC+2)
+  workflow_dispatch:  # 允許手動觸發
 
 jobs:
-  fetch-catalog:
+  fetch:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt || pip install pandas requests beautifulsoup4
 
-      - name: Run catalog fetch script
+      - name: Run fetch script
         run: python fetch_catalog.py
 
-      - name: Commit and push catalog
+      - name: Commit and push catalog (with auto-skip if no change)
         run: |
           git config user.name "Yoko5566"
           git config user.email "ryone520@gmail.com"
-          git add data/car_catalog.csv
-          git commit -m "📦 更新 MiniGT 車款清單 catalog"
-          git push
+          git add data/*.csv
+          git diff --cached --quiet && echo "✅ No changes to commit" || (
+            git commit -m "📦 Auto update catalog" && git push
+          )
