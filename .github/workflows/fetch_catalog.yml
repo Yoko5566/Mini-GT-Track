@@ -1,0 +1,33 @@
+name: 🔄 Fetch MiniGT Catalog
+
+on:
+  workflow_dispatch:  # 手動執行
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨 2 點執行一次
+
+jobs:
+  fetch-catalog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run catalog fetch script
+        run: python fetch_catalog.py
+
+      - name: Commit and push catalog
+        run: |
+          git config user.name "Yoko5566"
+          git config user.email "ryone520@gmail.com"
+          git add data/car_catalog.csv
+          git commit -m "📦 更新 MiniGT 車款清單 catalog"
+          git push
