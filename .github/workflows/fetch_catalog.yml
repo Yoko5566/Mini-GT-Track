@@ -1,9 +1,7 @@
 name: 🔄 Fetch MiniGT Catalog
 
 on:
-  workflow_dispatch:  # 手動執行
-  schedule:
-    - cron: '0 2 * * *'  # 每天凌晨 2 點執行一次
+  workflow_dispatch:  # ✅ 只保留這個，表示你可以手動觸發
 
 jobs:
   fetch-catalog:
